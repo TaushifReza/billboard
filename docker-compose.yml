@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    container_name: billboard-web
+    ports:
+      - "8081:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    restart: always
