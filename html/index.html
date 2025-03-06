@@ -56,11 +56,12 @@
     </a-scene>
 
     <div id="loadingScreen" class="loading-container">
+      <h1 class="title">Welcome to Augmented Reality</h1>
         <div class="spinner-container">
             <div class="spinner"></div>
         </div>
-        <h1 class="title">AR Experience</h1>
         <p class="subtitle">⚠️ <strong>Caution:</strong> When scanning the billboard make sure to be aware of your surroundings</p>
+        <p class="camera-notice">📷 This app will request access to your camera for the AR experience. Please allow access.</p>
     </div>
 
     <script>
@@ -69,7 +70,7 @@
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function(stream) {
                     console.log('Camera access granted');
-                })
+                })  
                 .catch(function(error) {
                     console.error('Camera access denied', error);
                     alert("Permission denied: Please enable camera access.");
