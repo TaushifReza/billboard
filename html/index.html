@@ -1,66 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindAR AR Experience</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <link rel="stylesheet" href="./css/style.css" />
-    <style>
-      .overlay {
-        position: fixed;
-        display: flex;
-        width: 100%;
-        bottom: 20px;
-        justify-content: center;
-        z-index: 10;
-      }
-      .overlay-button {
-        padding: 10px 20px;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border-radius: 5px;
-        border: none;
-        margin: 0 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <a-scene
-      mindar-image="imageTargetSrc: ./data/futuramabackdrop.mind"
-      color-space="sRGB"
-      renderer="colorManagement: true, physicallyCorrectLights"
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false"
-      loading-screen="enabled: false"
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <a-scene 
+        mindar-image="imageTargetSrc: ./data/futuramabackdrop.mind" 
+        color-space="sRGB"
+        renderer="colorManagement: true, physicallyCorrectLights"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="enabled: false"
+        id="arScene"
     >
-      <a-assets>
-        <a-asset-item
-          id="danceModelAsset"
-          src="./model/futurama-dance.glb"
-        ></a-asset-item>
-      </a-assets>
+        <a-assets>
+            <a-asset-item id="danceModelAsset" src="./model/futurama-dance.glb"></a-asset-item>
+            <!-- <a-asset-item id="secondModelAsset" src="./model/futurama-dance-updated.glb"></a-asset-item> -->
+        </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera position="0 1 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity id="target" mindar-image-target="targetIndex: 0">
-        <!-- Container for the hover animation -->
-        <a-entity id="modelContainer">
-          <!-- First model -->
-          <a-gltf-model
-            id="danceModel"
-            src="#danceModelAsset"
-            position="0 -0.2 0"
-            scale="3.5 3.5 3.5"
-            animation-mixer
-            class="model"
-            visible="true"
-          ></a-gltf-model>
-
-          <!-- Second model (initially hidden) -->
-          <!-- <a-gltf-model 
+        <a-entity id="target" mindar-image-target="targetIndex: 0">
+            <!-- Container for the hover animation -->
+            <a-entity id="modelContainer" animation="property: position; from: 0 -0.2 0; to: 0 -0.1 0; dir: alternate; dur: 5000; easing: easeInOutSine; loop: true">
+                <!-- First model (initially invisible) -->
+                <a-gltf-model 
+                    id="danceModel"
+                    src="#danceModelAsset" 
+                    position="0 -0.1 0.3"
+                    scale="3.5 3.5 3.5"
+                    animation-mixer
+                    class="model"
+                    visible="false"
+                ></a-gltf-model>
+                
+                <!-- Second model (initially invisible) -->
+                <!-- <a-gltf-model 
                     id="secondModel"
                     src="#secondModelAsset"
                     position="0 0 0.3"
@@ -69,29 +50,75 @@
                     class="model"
                     visible="false"
                 ></a-gltf-model> -->
+
+            </a-entity>
         </a-entity>
-      </a-entity>
     </a-scene>
 
+    <div id="loadingScreen" class="loading-container">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+        </div>
+        <h1 class="title">AR Experience</h1>
+        <p class="subtitle">⚠️ <strong>Caution:</strong> When scanning the billboard make sure to be aware of your surroundings</p>
+    </div>
+
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // Camera permission check
+        document.addEventListener("DOMContentLoaded", () => {
+            // Camera permission check
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    console.log('Camera access granted');
+                })
+                .catch(function(error) {
+                    console.error('Camera access denied', error);
+                    alert("Permission denied: Please enable camera access.");
+                });
 
-        const danceModel = document.getElementById("danceModel");
-        const secondModel = document.getElementById("secondModel");
-        const switchButton = document.getElementById("switchButton");
-        let currentModel = "danceModel";
+            const danceModel = document.getElementById('danceModel');
+            const secondModel = document.getElementById('secondModel');
+            let currentModel = 'danceModel';
+            
+            // Function to switch models
+            function switchModel() {
+                if (currentModel === 'danceModel') {
+                    danceModel.setAttribute('visible', 'false');
+                    secondModel.setAttribute('visible', 'true');
+                    currentModel = 'secondModel';
+                } else {
+                    danceModel.setAttribute('visible', 'true');
+                    secondModel.setAttribute('visible', 'false');
+                    currentModel = 'danceModel';
+                }
+            }
 
-        // Function to switch models
+            // Setup target detection event
+            const target = document.getElementById('target');
 
-        // Initial timeout to show first model for 15 seconds
+            // Only show the models once the target image is found
+            target.addEventListener('targetFound', event => {
+                // Show the first model when the target is detected
+                danceModel.setAttribute('visible', 'true');
+                // Optional: Switch model after a delay (e.g., 15 seconds)
+                setTimeout(() => {
+                    switchModel();
+                }, 10000);
+            });
 
-        // Setup target detection event
-        const target = document.getElementById("target");
-        target.addEventListener("targetFound", (event) => {});
+            target.addEventListener('targetLost', event => {
+                // Optionally hide models when the target is lost
+                danceModel.setAttribute('visible', 'false');
+                secondModel.setAttribute('visible', 'false');
+            });
 
-        target.addEventListener("targetLost", (event) => {});
-      });
+            // Hide loading screen once the scene has loaded
+            const arScene = document.getElementById('arScene');
+            arScene.addEventListener('loaded', () => {
+                // Hide the loading screen
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.style.display = 'none';
+            });
+        });
     </script>
-  </body>
+</body>
 </html>
