@@ -20,15 +20,16 @@
         id="arScene"
     >
         <a-assets>
-            <a-asset-item id="danceModelAsset" src="./model/futurama-dance.glb"></a-asset-item>
-            <!-- <a-asset-item id="secondModelAsset" src="./model/futurama-dance-updated.glb"></a-asset-item> -->
+            <a-asset-item id="danceModelAsset" src="./model/danceCompressed.glb"></a-asset-item>
+            <!-- <a-asset-item id="danceModelAsset" src="https://3-d-models-zeta.vercel.app/danceCompressed.glb"></a-asset-item> -->
+            <!-- <a-asset-item id="secondModelAsset" src="https://3-d-models-zeta.vercel.app/hoverCompressed.glb"></a-asset-item> -->
         </a-assets>
 
         <a-camera position="0 1 0" look-controls="enabled: false"></a-camera>
 
         <a-entity id="target" mindar-image-target="targetIndex: 0">
             <!-- Container for the hover animation -->
-            <a-entity id="modelContainer" animation="property: position; from: 0 -0.2 0; to: 0 -0.1 0; dir: alternate; dur: 5000; easing: easeInOutSine; loop: true">
+            <a-entity id="modelContainer" animation="loop: true">
                 <!-- First model (initially invisible) -->
                 <a-gltf-model 
                     id="danceModel"
@@ -77,21 +78,22 @@
                 });
 
             const danceModel = document.getElementById('danceModel');
-            const secondModel = document.getElementById('secondModel');
+            // const secondModel = document.getElementById('secondModel');
+
             let currentModel = 'danceModel';
             
-            // Function to switch models
-            function switchModel() {
-                if (currentModel === 'danceModel') {
-                    danceModel.setAttribute('visible', 'false');
-                    secondModel.setAttribute('visible', 'true');
-                    currentModel = 'secondModel';
-                } else {
-                    danceModel.setAttribute('visible', 'true');
-                    secondModel.setAttribute('visible', 'false');
-                    currentModel = 'danceModel';
-                }
-            }
+            // // Function to switch models
+            // function switchModel() {
+            //     if (currentModel === 'danceModel') {
+            //         danceModel.setAttribute('visible', 'false');
+            //         secondModel.setAttribute('visible', 'true');
+            //         currentModel = 'secondModel';
+            //     } else {
+            //         danceModel.setAttribute('visible', 'true');
+            //         secondModel.setAttribute('visible', 'false');
+            //         currentModel = 'danceModel';
+            //     }
+            // }
 
             // Setup target detection event
             const target = document.getElementById('target');
@@ -100,16 +102,14 @@
             target.addEventListener('targetFound', event => {
                 // Show the first model when the target is detected
                 danceModel.setAttribute('visible', 'true');
-                // Optional: Switch model after a delay (e.g., 15 seconds)
-                setTimeout(() => {
-                    switchModel();
-                }, 10000);
+                // setTimeout(() => {
+                //     switchModel();
+                // }, 10000);
             });
 
             target.addEventListener('targetLost', event => {
-                // Optionally hide models when the target is lost
                 danceModel.setAttribute('visible', 'false');
-                secondModel.setAttribute('visible', 'false');
+                // secondModel.setAttribute('visible', 'false');
             });
 
             // Hide loading screen once the scene has loaded
