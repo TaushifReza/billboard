@@ -11,7 +11,7 @@
 </head>
 <body>
     <a-scene 
-        mindar-image="imageTargetSrc: ./data/futuramabackdrop.mind" 
+        mindar-image="imageTargetSrc: ./data/futuramabackdrop.mind; missTolerance: 5; smoothFactor: 0.9" 
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights"
         vr-mode-ui="enabled: false"
@@ -28,29 +28,18 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity id="target" mindar-image-target="targetIndex: 0">
-            <!-- Container for the hover animation -->
+            <!-- Container for the hover animation -->  
             <a-entity id="modelContainer" animation="loop: true">
                 <!-- First model (initially invisible) -->
                 <a-gltf-model 
                     id="danceModel"
                     src="#danceModelAsset" 
-                    position="0 -0.1 0.3"
+                    position="0 -0.2 0"
                     scale="3.5 3.5 3.5"
                     animation-mixer
                     class="model"
                     visible="false"
                 ></a-gltf-model>
-                
-                <!-- Second model (initially invisible) -->
-                <!-- <a-gltf-model 
-                    id="secondModel"
-                    src="#secondModelAsset"
-                    position="0 0 0.3"
-                    scale="3.5 3.5 3.5"
-                    animation-mixer
-                    class="model"
-                    visible="false"
-                ></a-gltf-model> -->
 
             </a-entity>
         </a-entity>
@@ -77,34 +66,15 @@
                     alert("Permission denied: Please enable camera access.");
                 });
 
-            const danceModel = document.getElementById('danceModel');
+            const currentModel = document.getElementById('danceModel');
             // const secondModel = document.getElementById('secondModel');
-
-            let currentModel = 'danceModel';
-            
-            // // Function to switch models
-            // function switchModel() {
-            //     if (currentModel === 'danceModel') {
-            //         danceModel.setAttribute('visible', 'false');
-            //         secondModel.setAttribute('visible', 'true');
-            //         currentModel = 'secondModel';
-            //     } else {
-            //         danceModel.setAttribute('visible', 'true');
-            //         secondModel.setAttribute('visible', 'false');
-            //         currentModel = 'danceModel';
-            //     }
-            // }
-
-            // Setup target detection event
+        
             const target = document.getElementById('target');
 
             // Only show the models once the target image is found
             target.addEventListener('targetFound', event => {
                 // Show the first model when the target is detected
                 danceModel.setAttribute('visible', 'true');
-                // setTimeout(() => {
-                //     switchModel();
-                // }, 10000);
             });
 
             target.addEventListener('targetLost', event => {
